@@ -1,0 +1,51 @@
+import io.restassured.RestAssured;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+
+public class AddToCartApiTests {
+
+    String userId = "12345";
+
+    @BeforeClass
+    public static void setup() {
+        RestAssured.baseURI = "http://localhost:3001";
+    }
+
+
+    @Test
+    public void AddToCartTest() {
+
+        String requestParams = "{\"bookId\":\"123456\"}";
+
+        given()
+                .contentType("application/json")
+                .pathParam("userId", userId)
+                .body(requestParams)
+                .when()
+                .post("/users/{userId}/cart")
+                .then()
+                .statusCode(200)
+                .body("message", equalTo("Book added to cart"));
+
+    }
+
+    @Test
+    public void AddToCartFailedTest() {
+
+        String requestParams = "{\"bookId\":\"456789\"}";
+
+        given()
+                .contentType("application/json")
+                .pathParam("userId", userId)
+                .body(requestParams)
+                .when()
+                .post("/users/{userId}/cart")
+                .then()
+                .statusCode(404)
+                .body("error", equalTo("Book not found"));
+
+    }
+}
