@@ -1,0 +1,47 @@
+import io.restassured.RestAssured;
+import org.json.JSONObject;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.core.IsEqual.equalTo;
+
+public class RegistrationApiTest {
+
+    @BeforeClass
+    public static void setup() {
+        RestAssured.baseURI = "http://localhost:3001";
+    }
+
+    @Test
+    public void testRegistration() {
+
+        String requestParams = "{\"email\":\"test@test.com\", \"password\":\"password\"}";
+
+        given()
+                .contentType("application/json")
+                .body(requestParams)
+                .when()
+                .post("/users/register")
+                .then()
+                .statusCode(200)
+                .body("message", equalTo("User registered successfully"))
+                .body("userId", equalTo("12345"));
+    }
+
+    @Test
+    public void testUserAlreadyRegistered() {
+
+        String requestParams = "{\"email\":\"test1@test.com\", \"password\":\"password\"}";
+
+        given()
+                .contentType("application/json")
+                .body(requestParams)
+                .when()
+                .post("/users/register")
+                .then()
+                .statusCode(400)
+                .body("error", equalTo("User already exists"));
+    }
+
+}
