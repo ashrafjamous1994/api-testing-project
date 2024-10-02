@@ -1,0 +1,45 @@
+
+import io.restassured.RestAssured;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.core.IsEqual.equalTo;
+
+public class LoginApiTest {
+
+    @BeforeClass
+    public static void setup() {
+        RestAssured.baseURI = "http://localhost:3001";
+    }
+
+    @Test
+    public void testLogin() {
+
+        String requestParams = "{\"email\":\"test@test.com\" \"password\":\"password\"}";
+
+        given()
+                .contentType("application/json")
+                .body(requestParams)
+                .when()
+                .post("/users/login")
+                .then()
+                .statusCode(200)
+                .body("message", equalTo("Login successful"));
+    }
+
+    @Test
+    public void testFailedLogin() {
+
+        String requestParams = "{\"email\":\"test@test.com\", \"password\":\"wrongPassword\"}";
+
+        given()
+                .contentType("application/json")
+                .body(requestParams)
+                .when()
+                .post("/users/login")
+                .then()
+                .statusCode(400)
+                .body("error", equalTo("Invalid username or password"));
+    }
+}
