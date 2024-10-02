@@ -1,0 +1,52 @@
+import io.restassured.RestAssured;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+
+public class SearchApiTest {
+
+    @BeforeClass
+    public static void setup() {
+        RestAssured.baseURI = "http://localhost:3001";
+    }
+
+    @Test
+    public void testSearch() {
+
+        given()
+                .queryParam("search", "Book1")
+                .when()
+                .get("/books")
+                .then()
+                .statusCode(200)
+                .body("books[0].title", equalTo("The Great Gatsby"))
+                .body("books[0].id", equalTo("1"))
+                .body("books[0].price", equalTo(10.99F));
+    }
+
+    @Test
+    public void testFailedSearch() {
+
+        given()
+                .queryParam("search", "Book2")
+                .when()
+                .get("/books")
+                .then()
+                .statusCode(404)
+                .body("error", equalTo("No books found"));
+    }
+
+    @Test
+    public void testEmptyQueryParam() {
+
+        given()
+                .queryParam("search", "")
+                .when()
+                .get("/books")
+                .then()
+                .statusCode(400)
+                .body("error", equalTo("Query parameter is required."));
+    }
+}
