@@ -4,6 +4,10 @@
 
 This project contains automated tests for various API endpoints using Java, RestAssured, and Mockoon for mocking API responses.
 
+## Json Schema
+
+JSON schema for requests and responses for each endpoint can be found in `API.md`
+
 ## Setting Up Mockoon
 
 1. **Download and Install Mockoon**:
