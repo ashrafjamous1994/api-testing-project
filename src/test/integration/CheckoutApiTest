@@ -1,0 +1,52 @@
+import io.restassured.RestAssured;
+import org.json.JSONObject;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+
+public class CheckoutApiTest {
+    String userId = "12345";
+
+    @BeforeClass
+    public static void setup() {
+        RestAssured.baseURI = "http://localhost:3001";
+    }
+
+
+    @Test
+    public void checkoutTest() {
+
+        String requestParams = "{\"paymentMethod\":\"visa\"}";
+
+
+        given()
+                .contentType("application/json")
+                .pathParam("userId", userId)
+                .body(requestParams)
+                .when()
+                .post("/users/{userId}/checkout")
+                .then()
+                .statusCode(200)
+                .body("message", equalTo("Checkout successful"));
+    }
+
+    @Test
+    public void checkoutFailedTest() {
+
+        String requestParams = "{\"paymentMethod\":\"paypal\"}";
+
+
+        given()
+                .contentType("application/json")
+                .pathParam("userId", userId)
+                .body(requestParams)
+                .when()
+                .post("/users/{userId}/checkout")
+                .then()
+                .statusCode(402)
+                .body("error", equalTo("Payment declined"));
+    }
+
+}
