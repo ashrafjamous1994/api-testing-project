@@ -26,7 +26,7 @@ JSON schema for requests and responses for each endpoint can be found in `API.md
 
 ## Run the test
 
-- clone the repo
+- clone api-testing-project repo https://github.com/ashrafjamous1994/api-testing-project
 - Run the test by run
     ```bash
    mvn test
