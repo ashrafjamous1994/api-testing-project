@@ -1,0 +1,150 @@
+import io.restassured.RestAssured;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static io.restassured.RestAssured.given;
+
+public class PerformanceTest {
+
+    private static final int NUM_REQUESTS = 100;
+
+    @BeforeClass
+    public static void setup() {
+        RestAssured.baseURI = "http://localhost:3001";
+    }
+    @Test
+    public void loginApiTest(){
+        long totalResponseTime = 0;
+        String requestParams = "{\"email\":\"test@test.com\" \"password\":\"password\"}";
+
+
+        for (int i = 0; i < NUM_REQUESTS; i++) {
+            long startTime = System.currentTimeMillis();
+
+            given()
+                    .contentType("application/json")
+                    .body(requestParams)
+                    .when()
+                    .post("/users/login")
+                    .then()
+                    .statusCode(200);
+
+            long responseTime = System.currentTimeMillis() - startTime;
+            totalResponseTime += responseTime;
+            System.out.println("Response Time for request " + (i + 1) + ": " + responseTime + " ms");
+        }
+
+        double averageResponseTime = (double) totalResponseTime / NUM_REQUESTS;
+        System.out.println("Average Response Time: " + averageResponseTime + " ms");
+
+        assert averageResponseTime < 50 : "Average response time exceeded the expected limit";
+    }
+
+    @Test
+    public void registrationApiTest() {
+        long totalResponseTime = 0;
+        String requestParams = "{\"email\":\"test@test.com\", \"password\":\"password\"}";
+
+        for (int i = 0; i < NUM_REQUESTS; i++) {
+            long startTime = System.currentTimeMillis();
+        given()
+                .contentType("application/json")
+                .body(requestParams)
+                .when()
+                .post("/users/register")
+                .then()
+                .statusCode(200);
+            long responseTime = System.currentTimeMillis() - startTime;
+            totalResponseTime += responseTime;
+            System.out.println("Response Time for request " + (i + 1) + ": " + responseTime + " ms");
+        }
+
+        double averageResponseTime = (double) totalResponseTime / NUM_REQUESTS;
+        System.out.println("Average Response Time: " + averageResponseTime + " ms");
+
+        assert averageResponseTime < 50 : "Average response time exceeded the expected limit";
+    }
+
+    @Test
+    public void AddToCartTest() {
+        long totalResponseTime = 0;
+        String userId = "12345";
+        String requestParams = "{\"bookId\":\"123456\"}";
+
+        for (int i=0; i<NUM_REQUESTS ;i++) {
+            long startTime = System.currentTimeMillis();
+            given()
+                    .contentType("application/json")
+                    .pathParam("userId", userId)
+                    .body(requestParams)
+                    .when()
+                    .post("/users/{userId}/cart")
+                    .then()
+                    .statusCode(200);
+
+            long responseTime= System.currentTimeMillis()-startTime;
+            totalResponseTime += responseTime;
+            System.out.println("Response Time for request " + (i+1) +": "+ responseTime + "ms");
+        }
+
+        double averageResponseTime = (double) totalResponseTime/NUM_REQUESTS;
+        System.out.println("Average Response Time: " + averageResponseTime + "ms");
+
+        assert averageResponseTime < 50 : "Average response time exceed the limit";
+
+    }
+
+    @Test
+    public void checkoutTest() {
+        String userId = "12345";
+        String requestParams = "{\"paymentMethod\":\"visa\"}";
+        long totalResponseTime = 0;
+
+        for (int i=0; i<NUM_REQUESTS ; i++) {
+            long startTime = System.currentTimeMillis();
+            given()
+                    .contentType("application/json")
+                    .pathParam("userId", userId)
+                    .body(requestParams)
+                    .when()
+                    .post("/users/{userId}/checkout")
+                    .then()
+                    .statusCode(200);
+
+            long responseTime = System.currentTimeMillis() - startTime;
+            totalResponseTime+= responseTime;
+            System.out.println("Response Time for request " + (i+1) +": "+responseTime+"ms");
+        }
+
+        double averageResponseTime = (double) totalResponseTime/NUM_REQUESTS;
+        System.out.println("Average Response Time: "+ averageResponseTime+"ms");
+
+        assert averageResponseTime < 50 : "Average response time exceed the limit";
+    }
+
+    @Test
+    public void testSearch() {
+        long totalResponseTime =0;
+
+
+        for (int i=0; i<NUM_REQUESTS ; i++) {
+            long startTime= System.currentTimeMillis();
+            given()
+                    .queryParam("search", "Book1")
+                    .when()
+                    .get("/books")
+                    .then()
+                    .statusCode(200);
+
+            long responseTime= System.currentTimeMillis()-startTime;
+            totalResponseTime+=responseTime;
+            System.out.println("Response Time for request "+(i+1)+": ");
+        }
+
+        double averageTime= (double) totalResponseTime /NUM_REQUESTS;
+        System.out.println("Average Response Time: " + averageTime);
+
+        assert averageTime < 50 :"Average response time exceed the limit";
+    }
+
+}
